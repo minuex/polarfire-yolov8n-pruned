@@ -34,5 +34,8 @@ Desktop.ini
 *.swp
 *~
 
-# Images, annotated inference results, TXT labels/logs, and README are
-# intentionally tracked. Do not add *.jpg, *.png, *.txt, or README.md here.
+# README is being revised locally and will be published later.
+README.md
+
+# Images, annotated inference results, and TXT labels/logs are intentionally
+# tracked. Do not add *.jpg, *.png, or *.txt ignore rules here.
