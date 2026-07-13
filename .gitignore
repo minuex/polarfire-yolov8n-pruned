@@ -1,0 +1,38 @@
+# Local VectorBlox model binaries
+*.vnnx
+
+# Archives and board/SDK backups
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+*.rar
+
+# Cross-compiled binaries and build products
+/run-yolov8n
+*.o
+*.d
+*.a
+*.so
+obj/
+**/obj/
+
+# Professor's original reference implementation (kept locally only)
+/soc-c/run-model.cpp
+/postprocess/postprocess.c
+/postprocess/postprocess.h
+
+# Local Codex/agent metadata
+/.agents/
+/.codex/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# Images, annotated inference results, TXT labels/logs, and README are
+# intentionally tracked. Do not add *.jpg, *.png, *.txt, or README.md here.
