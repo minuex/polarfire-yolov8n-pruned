@@ -9,9 +9,7 @@ extern "C" {
 
 #define YOLOV8N_NUM_OUTPUTS 3
 #define YOLOV8N_REG_MAX 16
-#define YOLOV8N_NUM_CLASSES 1
-#define YOLOV8N_OUTPUT_CHANNELS \
-    (4 * YOLOV8N_REG_MAX + YOLOV8N_NUM_CLASSES)
+#define YOLOV8N_DFL_CHANNELS (4 * YOLOV8N_REG_MAX)
 
 typedef enum {
     YOLOV8N_LAYOUT_NHWC = 0,
@@ -34,6 +32,7 @@ typedef struct {
     int input_height;
     int image_width;
     int image_height;
+    int num_classes;
     int transpose_xy;
     float confidence_threshold;
     float nms_iou_threshold;
@@ -50,7 +49,7 @@ typedef struct {
 
 /*
  * Decodes three raw YOLOv8 tensors containing 64 DFL channels followed by
- * one class-logit channel. NHWC, NCHW, and VectorBlox NHCW memory layouts
+ * one or more class-logit channels. NHWC, NCHW, and VectorBlox NHCW layouts
  * are supported.
  * Coordinates are returned in image_width x image_height space. The caller
  * owns the output array.

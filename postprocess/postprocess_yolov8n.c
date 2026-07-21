@@ -10,6 +10,7 @@ typedef struct {
     float x2;
     float y2;
     float score;
+    int class_id;
 } candidate_t;
 
 static float clampf(float value, float low, float high)
@@ -112,6 +113,7 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
     if (!outputs || !config || !detections || max_detections <= 0 ||
         config->input_width <= 0 || config->input_height <= 0 ||
         config->image_width <= 0 || config->image_height <= 0 ||
+        config->num_classes <= 0 ||
         config->confidence_threshold <= 0.0f ||
         config->confidence_threshold >= 1.0f ||
         config->nms_iou_threshold <= 0.0f ||
@@ -122,7 +124,8 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
     for (output_index = 0; output_index < YOLOV8N_NUM_OUTPUTS; ++output_index) {
         const yolov8n_output_t *output = &outputs[output_index];
         if (!output->data || output->height <= 0 || output->width <= 0 ||
-            output->channels != YOLOV8N_OUTPUT_CHANNELS || output->scale <= 0.0f) {
+            output->channels != YOLOV8N_DFL_CHANNELS + config->num_classes ||
+            output->scale <= 0.0f) {
             return -1;
         }
         capacity += (size_t)output->height * output->width;
@@ -140,13 +143,21 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
 
         for (y = 0; y < output->height; ++y) {
             for (x = 0; x < output->width; ++x) {
-                float class_logit = tensor_value(output, y, x,
-                                                 4 * YOLOV8N_REG_MAX);
-                float score = sigmoidf_stable(class_logit);
+                float score = 0.0f;
+                int class_id = 0;
                 candidate_t *candidate;
                 float center_x;
                 float center_y;
 
+                for (int class_index = 0;
+                     class_index < config->num_classes; ++class_index) {
+                    float class_score = sigmoidf_stable(tensor_value(
+                        output, y, x, YOLOV8N_DFL_CHANNELS + class_index));
+                    if (class_score > score) {
+                        score = class_score;
+                        class_id = class_index;
+                    }
+                }
                 if (score < config->confidence_threshold) continue;
 
                 candidate = &candidates[count++];
@@ -157,6 +168,7 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
                 candidate->x2 = center_x + dfl_expectation(output, y, x, 2) * stride_x;
                 candidate->y2 = center_y + dfl_expectation(output, y, x, 3) * stride_y;
                 candidate->score = score;
+                candidate->class_id = class_id;
             }
         }
     }
@@ -200,10 +212,11 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
             detection->y2 = clampf(y2 * scale_y, 0.0f,
                                     (float)(config->image_height - 1));
             detection->confidence = candidates[i].score;
-            detection->class_id = 0;
+            detection->class_id = candidates[i].class_id;
 
             for (j = i + 1; j < count; ++j) {
                 if (!suppressed[j] &&
+                    candidates[i].class_id == candidates[j].class_id &&
                     box_iou(&candidates[i], &candidates[j]) >
                         config->nms_iou_threshold) {
                     suppressed[j] = 1;

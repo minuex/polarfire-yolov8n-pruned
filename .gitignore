@@ -39,3 +39,9 @@ README.md
 
 # Images, annotated inference results, and TXT labels/logs are intentionally
 # tracked. Do not add *.jpg, *.png, or *.txt ignore rules here.
+/soc-c/dts
+/KITSAT3_single/
+/scripts/
+run-yolov8n-dma64
+BENCHMARK.md
+
