@@ -487,6 +487,11 @@ int main(int argc, char **argv)
         std::free(original_image);
         return 1;
     }
+    /*
+     * Detection-only benchmark: the source frame is no longer needed here.
+     * An integrated pose runner must retain original_image until covariance
+     * ROI/refinement and pose estimation have completed; see POSE_HANDOFF.md.
+     */
     std::free(original_image);
     original_image = NULL;
     if (input_is_hcw) {
