@@ -1,0 +1,10 @@
+--- a/drivers/vectorblox/vbx_cnn_api.c
++++ b/drivers/vectorblox/vbx_cnn_api.c
+@@ -117,7 +117,8 @@
+ 
+ }
+ #if MSS_DDR
+-#define DMA_DEV "udmabuf-ddr-nc0"
++/* 64 MiB DMA pool created by the PolarFire vbx_dma64 overlay. */
++#define DMA_DEV "udmabuf-vbx64"
+ static size_t uio_dma_size(){

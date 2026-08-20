@@ -1,0 +1,71 @@
+PolarFire SoC - KITSAT3_single 이미지 1장 추론 예제
+====================================================
+
+전제 경로
+---------
+
+실행 바이너리:
+  /root/run-yolov8n-dma64
+
+모델:
+  /root/KITSAT3_single/pruned_kd_single.vnnx
+
+테스트 이미지:
+  /root/KITSAT3_single/kitsat3_single_val/val_jpeg/images/dir_kitsat3_0001.jpg
+
+# 1. 기본 VectorBlox 가속기 오버레이
+cd /root/VectorBlox-SDK/example/soc-c
+make overlay
+
+# 2. 추가 64 MiB DMA 오버레이
+cd /root/VectorBlox-SDK/example/soc-c/dts
+bash overlay.sh add vbx_dma64.dtbo
+
+# 3. 이미지 1장 추론
+cd /root
+export VBX_DMA_DEVICE=udmabuf-vbx64
+
+/root/run-yolov8n-dma64 \
+  /root/KITSAT3_single/pruned_kd_single.vnnx \
+  /root/KITSAT3_single/kitsat3_single_val/val_jpeg/images/dir_kitsat3_0001.jpg \
+  0.30 0.40 \
+  0 1
+
+# 4. 성능 측정용 100회 추론
+
+/root/run-yolov8n-dma64 \
+  /root/KITSAT3_single/pruned_kd_single.vnnx \
+  /root/KITSAT3_single/kitsat3_single_val/val_jpeg/images/dir_kitsat3_0001.jpg \
+  0.30 0.40 \
+  10 100 \
+  2>&1 | tee /root/pruned_kd_single_w10_r100.log
+
+====================================================================
++ multi 데이터용 모델 추론
+
+# 1. 데이터, 모델설정
+cd /root
+
+export MULTI_ROOT=/root/KITSAT3_multi
+export VBX_DMA_DEVICE=udmabuf-vbx64
+
+IMAGE="$MULTI_ROOT/dataset/unused_100/images/small_000252.jpg"
+
+echo "$IMAGE"
+file "$IMAGE"
+ls -lh "$MULTI_ROOT/models/"*.vnnx
+
+# 2. 이미지 1장 추론
+/root/run-yolov8n-dma64 \
+  "$MULTI_ROOT/models/pruned_kd_multi.vnnx" \
+  "$IMAGE" \
+  0.30 0.40 \
+  0 1
+
+# 3. 성능 측정용 100회 추론
+/root/run-yolov8n-dma64 \
+  "$MULTI_ROOT/models/${MODEL}.vnnx" \
+  "$IMAGE" \
+  0.30 0.40 \
+  10 100 \
+  2>&1 | tee "/root/${MODEL}_w10_r100.log"
