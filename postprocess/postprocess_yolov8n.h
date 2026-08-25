@@ -59,6 +59,19 @@ int yolov8n_postprocess(const yolov8n_output_t outputs[YOLOV8N_NUM_OUTPUTS],
                         yolov8n_detection_t *detections,
                         int max_detections);
 
+/* PolarFire 통합 파이프라인용 실행 API. */
+int yolo_init(const char *model_path,
+              float confidence_threshold,
+              float nms_iou_threshold);
+
+int yolo_detect(const uint8_t *pixels,
+                int width,
+                int height,
+                int stride_bytes,
+                int channels,
+                yolov8n_detection_t *detections,
+                int max_detections);
+
 #ifdef __cplusplus
 }
 #endif

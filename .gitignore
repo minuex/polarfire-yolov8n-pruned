@@ -1,7 +1,13 @@
-# Local VectorBlox model binaries
+# Models, datasets, test media, and generated predictions
 *.vnnx
+*.jpg
+*.jpeg
+*.png
+*.csv
+/KITSAT3_single/
+/soc-c/dts/
 
-# Archives and board/SDK backups
+# Archives, SDK/sysroot backups, and transfer packages
 *.tar
 *.tar.gz
 *.tgz
@@ -10,7 +16,8 @@
 *.rar
 
 # Cross-compiled binaries and build products
-/run-yolov8n
+run-yolov8n*
+pipeline-yolo-pose-c
 *.o
 *.d
 *.a
@@ -18,31 +25,36 @@
 obj/
 **/obj/
 
-# Professor's original reference implementation (kept locally only)
+# Private handoff and system/Pose integration material
+/Polarfire_SoC_testkit/
+/Polarfire_SoC_testkit_C/
+/yolo_dma_c/
+/private_notes/
+/0811/
+
+# Professor's original reference implementation (local only)
 /soc-c/run-model.cpp
+/soc-c/run_yolov8n.cpp
 /postprocess/postprocess.c
 /postprocess/postprocess.h
 
-# Local Codex/agent metadata
+# Local experiment notes and generated logs
+*.txt
+*.log
+/BENCHMARK.md
+/polarfire_yolov8n_notes.md
+/starlink_finetuning_notes.md
+/README_VectorBlox_WSL_Backup.md
+
+# Local agent/editor metadata
 /.agents/
 /.codex/
-
-# OS/editor noise
 .DS_Store
 Thumbs.db
 Desktop.ini
 *.swp
 *~
 
-# README is being revised locally and will be published later.
-README.md
-*.md
-
-# Images, annotated inference results, and TXT labels/logs are intentionally
-# tracked. Do not add *.jpg, *.png, or *.txt ignore rules here.
-/soc-c/dts
-/KITSAT3_single/
-/scripts/
-run-yolov8n-dma64
-BENCHMARK.md
-
+# Public documentation exceptions
+!README.md
+!/docs/*.md
